@@ -1,26 +1,32 @@
 'use client';
 
+import { SignOutButton } from '@clerk/nextjs';
 import {
+  Button,
   Card,
   Col,
+  Flex,
   Grid,
   Tab,
   TabGroup,
   TabList,
   TabPanel,
   TabPanels,
-  Text,
   Title,
 } from '@tremor/react';
 import Categories from './Categories';
 import MainMetrics from './MainMetrics';
 import Monthly from './Monthly';
 
-const BasicDashboard = () => {
+const Dashboard = () => {
   return (
     <main className="max-w-screen-2xl m-auto py-4 px-4 md:px-8">
-      <Title>Dashboard</Title>
-      <Text>Lorem ipsum dolor sit amet, consetetur sadipscing elitr.</Text>
+      <Flex justifyContent="between">
+        <Title>Dashboard</Title>
+        <SignOutButton>
+          <Button className="transition-colors">Sign out</Button>
+        </SignOutButton>
+      </Flex>
 
       <TabGroup className="mt-6">
         <TabList>
@@ -52,4 +58,4 @@ const BasicDashboard = () => {
   );
 };
 
-export default BasicDashboard;
+export default Dashboard;
