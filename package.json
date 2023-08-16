@@ -10,6 +10,7 @@
     "test:ts": "tsc --noEmit"
   },
   "dependencies": {
+    "@clerk/nextjs": "^4.23.2",
     "@headlessui/tailwindcss": "^0.2.0",
     "@heroicons/react": "^1.0.6",
     "@phosphor-icons/react": "^2.0.10",
