@@ -16,7 +16,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        elements: {
+          footer: 'hidden',
+          card: 'bg-tremor-background dark:bg-dark-tremor-background',
+          headerTitle:
+            'text-tremor-content-emphasis dark:text-dark-tremor-content-emphasis',
+          headerSubtitle: 'text-tremor-content dark:text-dark-tremor-content',
+          socialButtonsBlockButton:
+            'dark:bg-dark-tremor-background-emphasis dark:hover:bg-gray-400',
+        },
+      }}
+    >
       <html lang="en">
         <body className={inter.className}>{children}</body>
       </html>
