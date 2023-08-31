@@ -55,7 +55,7 @@ const MainMetrics = () => {
 
   return (
     <Grid numItemsSm={2} numItemsLg={3} className="gap-6 mt-6">
-      {categories(data ? data[0] : {}).map((item) => (
+      {categories(data && data.length > 0 ? data[0] : {}).map((item) => (
         <Card key={item.title} decoration="top" decorationColor={item.color}>
           <Flex justifyContent="start" className="space-x-4">
             <Icon
