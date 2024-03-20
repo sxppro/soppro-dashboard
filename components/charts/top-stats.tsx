@@ -4,9 +4,9 @@ import { AccountMonthlyInfo } from '@/server/schemas';
 import { formatCurrency } from '@/utils/helpers';
 import { useDate } from '@/utils/hooks';
 import { trpc } from '@/utils/trpc';
-import { Card, Color, Flex, Grid, Icon, Metric, Text } from '@tremor/react';
+import { Color, Grid } from '@tremor/react';
 import { List, Minus, Plus } from 'lucide-react';
-import { Skeleton } from '../ui/skeleton';
+import StatCard from '../core/stat-card';
 
 const TopStats = () => {
   const { date } = useDate();
@@ -74,26 +74,7 @@ const TopStats = () => {
   return (
     <Grid numItemsSm={2} numItemsLg={3} className="gap-6 mt-6">
       {parsedCategories.map((item) => (
-        <Card key={item.title} decoration="top" decorationColor={item.color}>
-          <Flex justifyContent="start" className="space-x-4">
-            <Icon
-              icon={item.icon}
-              variant="light"
-              size="xl"
-              color={item.color}
-            />
-            <div className="truncate flex-1">
-              <Flex alignItems="start" justifyContent="between">
-                <Text>{item.title}</Text>
-              </Flex>
-              {isLoading ? (
-                <Skeleton className="h-9 max-w-[150px]" />
-              ) : (
-                <Metric className="truncate">{item.metric}</Metric>
-              )}
-            </div>
-          </Flex>
-        </Card>
+        <StatCard key={item.title} info={{ ...item, isLoading }} />
       ))}
     </Grid>
   );

@@ -3,8 +3,8 @@ import { MetadataRoute } from 'next';
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'Soppro Dashboard',
-    short_name: 'Soppro Dashboard',
-    description: 'Smart transaction analysis by Soppro',
+    short_name: 'Dashboard',
+    description: 'Your money where you can see it',
     display: 'standalone',
     background_color: '#fff',
     theme_color: '#fff',

@@ -15,6 +15,13 @@ export const DateRangeSchema = z.object({
 });
 export type DateRange = z.infer<typeof DateRangeSchema>;
 
+export const TagInfoSchema = z.object({
+  Income: z.number(),
+  Expenses: z.number(),
+  Transactions: z.number(),
+});
+export type TagInfo = z.infer<typeof TagInfoSchema>;
+
 export const TransactionIdSchema = z.string().uuid();
 
 export const TransactionAccountTypeSchema = z.enum([

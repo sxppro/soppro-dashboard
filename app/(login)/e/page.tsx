@@ -1,7 +1,11 @@
 import { getCurrentUser } from '@/utils/auth';
 import { X } from 'lucide-react';
-import { NextPage } from 'next';
+import { Metadata, NextPage } from 'next';
 import { redirect } from 'next/navigation';
+
+export const metadata: Metadata = {
+  title: 'Dashboard — Login Error',
+};
 
 const LoginErrorPage: NextPage = async () => {
   const user = await getCurrentUser();

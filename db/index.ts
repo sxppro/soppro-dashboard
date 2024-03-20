@@ -1,11 +1,12 @@
-import type {
-  AccountBalanceHistory,
-  AccountMonthlyInfo,
-  DateRange,
-  TransactionAccountType,
-  TransactionCategoryInfo,
-  TransactionCategoryOption,
-  TransactionCategoryType,
+import {
+  TagInfo,
+  type AccountBalanceHistory,
+  type AccountMonthlyInfo,
+  type DateRange,
+  type TransactionAccountType,
+  type TransactionCategoryInfo,
+  type TransactionCategoryOption,
+  type TransactionCategoryType,
 } from '@/server/schemas';
 import {
   DbTransactionResource,
@@ -22,8 +23,10 @@ import {
   categoriesPipeline,
   monthlyStatsPipeline,
   searchTransactionsPipeline,
+  tagInfoPipeline,
   transactionsByDatePipeline,
   transactionsByTagsPipeline,
+  uniqueTagsPipeline,
 } from './pipelines';
 
 /**
@@ -196,6 +199,20 @@ export const getCategoryInfo = async (
 };
 
 /**
+ * Retrieves income and expense stats for a tag
+ * @param tag
+ * @returns
+ */
+export const getTagInfo = async (tag: string) => {
+  const { db } = await connectToDatabase('up');
+  const transactions = db.collection<DbTransactionResource>('transactions');
+  const cursor = transactions.aggregate<TagInfo>(tagInfoPipeline(tag));
+  const results = await cursor.toArray();
+  await cursor.close();
+  return results[0];
+};
+
+/**
  * Retrieves transactions between 2 dates
  * @param dateRange
  * @param options
@@ -247,10 +264,26 @@ const getTransactionById = async (id: string) => {
 };
 
 /**
+ * Retrieves transactions by specific tag
+ * @param tag
+ * @returns
+ */
+export const getTransactionsByTag = async (tag: string) => {
+  const { db } = await connectToDatabase('up');
+  const transactions = db.collection<DbTransactionResource>('transactions');
+  const cursor = transactions.find({ 'relationships.tags.data.id': tag });
+  const results = (await cursor.toArray()).map((transaction) =>
+    outputTransactionFields(transaction)
+  );
+  await cursor.close();
+  return results;
+};
+
+/**
  * Retrieves transactions by tags
  * @returns
  */
-const getTransactionsByTag = async () => {
+export const getTransactionsByTags = async () => {
   const { db } = await connectToDatabase('up');
   const transactions = db.collection<DbTransactionResource>('transactions');
   const cursor = transactions.aggregate(transactionsByTagsPipeline());
@@ -279,6 +312,20 @@ export const getCategories = async (type: TransactionCategoryType) => {
     });
   const results = await cursor.toArray();
   return results;
+};
+
+/**
+ * Retrieves all unique transaction tags
+ */
+export const getTags = async () => {
+  const { db } = await connectToDatabase('up');
+  const transactions = db.collection<DbTransactionResource>('transactions');
+  const cursor = transactions.aggregate<{ tags: string[] }>(
+    uniqueTagsPipeline()
+  );
+  const results = await cursor.toArray();
+  await cursor.close();
+  return results[0];
 };
 
 /**
@@ -335,6 +382,5 @@ export {
   getTransactionById,
   getTransactionsByCategory,
   getTransactionsByDate,
-  getTransactionsByTag,
   getTransfers,
 };

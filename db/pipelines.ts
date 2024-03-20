@@ -2,6 +2,57 @@ import { DateRange } from '@/server/schemas';
 import { TransactionRetrievalOptions } from '@/types/custom';
 
 /**
+ * Conditional aggregation to determine whether
+ * transaciton is income or expense based on
+ * attributes.amount.valueInBaseUnits
+ */
+const labelIncomeExpense = () => ({
+  $cond: [
+    {
+      $lt: ['$attributes.amount.valueInBaseUnits', 0],
+    },
+    'expense',
+    'income',
+  ],
+});
+
+/**
+ * Generates total income and expense statistics
+ * for transactions labelled by `labelIncomeExpense`
+ * ! Must be used in $group stage
+ * @param typeField field name holding transaction type (income or expense)
+ * @param amountField field name holding transaction amount
+ * @returns
+ */
+const generateStatsIncomeExpense = (
+  typeField: string,
+  amountField: string
+) => ({
+  income: {
+    $sum: {
+      $cond: [
+        {
+          $eq: [`$${typeField}`, 'income'],
+        },
+        `$${amountField}`,
+        0,
+      ],
+    },
+  },
+  expense: {
+    $sum: {
+      $cond: [
+        {
+          $eq: [`$${typeField}`, 'expense'],
+        },
+        `$${amountField}`,
+        0,
+      ],
+    },
+  },
+});
+
+/**
  * Pipeline stages to lookup transaction category ids to
  * prettify category names
  * @returns
@@ -116,15 +167,7 @@ const monthlyStatsPipeline = (from: Date, to: Date, accountId: string) => [
         },
       },
       amount: '$attributes.amount.valueInBaseUnits',
-      type: {
-        $cond: [
-          {
-            $lt: ['$attributes.amount.valueInBaseUnits', 0],
-          },
-          'expense',
-          'income',
-        ],
-      },
+      type: labelIncomeExpense(),
     },
   },
   // Group documents by month-year and type, calculate grouped income, expenses and number of transactions
@@ -134,28 +177,7 @@ const monthlyStatsPipeline = (from: Date, to: Date, accountId: string) => [
         month: '$month',
         year: '$year',
       },
-      income: {
-        $sum: {
-          $cond: [
-            {
-              $eq: ['$type', 'income'],
-            },
-            '$amount',
-            0,
-          ],
-        },
-      },
-      expense: {
-        $sum: {
-          $cond: [
-            {
-              $eq: ['$type', 'expense'],
-            },
-            '$amount',
-            0,
-          ],
-        },
-      },
+      ...generateStatsIncomeExpense('type', 'amount'),
       transactions: {
         $sum: 1,
       },
@@ -181,6 +203,68 @@ const monthlyStatsPipeline = (from: Date, to: Date, accountId: string) => [
     $sort: {
       Year: 1,
       Month: 1,
+    },
+  },
+];
+
+const uniqueTagsPipeline = () => [
+  {
+    $unwind: {
+      path: '$relationships.tags.data',
+    },
+  },
+  {
+    $group: {
+      _id: null,
+      tags: {
+        $addToSet: '$relationships.tags.data.id',
+      },
+    },
+  },
+  {
+    $project: {
+      _id: 0,
+      tags: {
+        $sortArray: { input: '$tags', sortBy: 1 },
+      },
+    },
+  },
+];
+
+const tagInfoPipeline = (tagId: string, monthly?: boolean) => [
+  {
+    $match: {
+      'attributes.isCategorizable': true,
+      'relationships.tags.data.id': tagId,
+    },
+  },
+  {
+    $project: {
+      amount: '$attributes.amount.valueInBaseUnits',
+      type: labelIncomeExpense(),
+    },
+  },
+  {
+    $group: {
+      _id: 0,
+      ...generateStatsIncomeExpense('type', 'amount'),
+      transactions: {
+        $sum: 1,
+      },
+    },
+  },
+  {
+    $project: {
+      _id: 0,
+      Income: {
+        $divide: ['$income', 100],
+      },
+      Expenses: {
+        $abs: {
+          $divide: ['$expense', 100],
+        },
+      },
+      Transactions: '$transactions',
     },
   },
 ];
@@ -507,6 +591,8 @@ export {
   categoriesPipeline,
   monthlyStatsPipeline,
   searchTransactionsPipeline,
+  tagInfoPipeline,
   transactionsByDatePipeline,
   transactionsByTagsPipeline,
+  uniqueTagsPipeline,
 };

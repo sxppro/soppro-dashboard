@@ -2,14 +2,11 @@ import ThemeProvider from '@/components/providers/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { Analytics } from '@vercel/analytics/react';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Soppro Dashboard',
-  description: 'Smart transaction analysis by Soppro',
+  description: 'Your money where you can see it',
   authors: [
     {
       name: 'Soppro',
@@ -35,7 +32,6 @@ export default async function RootLayout({
 }) {
   return (
     <html lang="en">
-      {/* className={inter.className} */}
       <body>
         <ThemeProvider
           attribute="class"

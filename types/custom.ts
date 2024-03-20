@@ -1,3 +1,4 @@
+import { Color } from '@tremor/react';
 import { components } from './up-api';
 
 import type { Binary } from 'bson';
@@ -51,3 +52,11 @@ export type TransactionRetrievalOptions = {
 };
 
 export type TransactionAccountType = 'transactional' | 'savings';
+
+export type StatCardInfo = {
+  title: string;
+  metric: string | number | undefined;
+  icon: any;
+  color: Color;
+  isLoading?: boolean;
+};

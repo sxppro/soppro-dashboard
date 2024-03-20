@@ -7,8 +7,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Up Dashboard — Login',
-  description: 'Smart transaction analysis by Soppro',
+  title: 'Dashboard — Login',
 };
 
 export default async function AuthenticationPage() {

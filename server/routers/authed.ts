@@ -3,6 +3,7 @@ import {
   getCategories,
   getCategoryInfo,
   getMonthlyInfo,
+  getTagInfo,
   getTransactionById,
   getTransactionsByDate,
   getTransfers,
@@ -103,6 +104,9 @@ export const authedRouter = router({
         };
       });
     }),
+  getTagInfo: authedProcedure.input(z.string()).query(async ({ input }) => {
+    return await getTagInfo(input);
+  }),
   getTransactionsByDate: authedProcedure
     .input(TransactionRetrievalOptionsSchema)
     .query(async ({ input }) => {

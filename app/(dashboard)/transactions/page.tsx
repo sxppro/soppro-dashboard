@@ -1,7 +1,12 @@
 import TableSkeleton from '@/components/core/table-skeleton';
 import TransactionTable from '@/components/tables/transaction-table';
 import { PageProps } from '@/types/custom';
+import { Metadata } from 'next';
 import { Suspense } from 'react';
+
+export const metadata: Metadata = {
+  title: 'Dashboard — Transactions',
+};
 
 // Disable data cache for transactions page
 export const revalidate = 0;
